@@ -28,7 +28,7 @@ jobs:
         run: |
           ENV_ID="${{ github.event.inputs.env_id }}"
           # RESPONSE=$(curl -s "https://api.qbraid.com/environments/valid?envId=$ENV_ID")
-          RESPONSE=true
+          RESPONSE=false
           echo "::set-output name=valid::$RESPONSE"
 
       - name: Install Python
