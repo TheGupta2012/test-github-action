@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: 'main'
 
       - name: Create edit branch
         run: git checkout -b readme-edit/${{ github.run_id }}
@@ -37,7 +35,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          
+      
+      - name: List files
+        run: ls -la 
+
       - name: Update README
         run: |
           ENV_ID="${{ github.event.inputs.env_id }}"
