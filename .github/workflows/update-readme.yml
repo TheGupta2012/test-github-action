@@ -45,20 +45,14 @@ jobs:
           python update_readme.py "$ENV_ID" "$REPO_OWNER" "$REPO_NAME" "$VALID"
         working-directory: ${{ github.workspace }}
 
-      - name: Check for changes
-        id: check_changes
+      - name: Commit changes
         run: |
           git add README.md
           if git diff-index --quiet HEAD --; then
             echo "No changes to commit"
-            echo "::set-output name=changes::false"
           else
             echo "Changes detected"
-            echo "::set-output name=changes::true"
+            git commit -m "Update README with dynamic image based on ENV_ID"
+            git push origin readme-edit/${{ github.run_id }}
           fi
 
-      - name: Commit changes
-        if: steps.check_changes.outputs.changes == 'true'
-        run: |
-          git commit -m "Update README with dynamic image based on ENV_ID"
-          git push origin readme-edit/${{ github.run_id }}
