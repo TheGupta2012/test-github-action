@@ -55,3 +55,9 @@ jobs:
           git add README.md
           git commit -m "Update README with dynamic image based on ENV_ID"
           git push origin readme-edit/${{ github.run_id }}
+
+      - name: Create Pull Request
+        run: |
+          gh pr create --title "Update README with dynamic image based on ENV_ID" --body "This PR updates the README with a dynamic image for the env_id: $ENV_ID." --base main --head readme-edit/${{ github.run_id }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
