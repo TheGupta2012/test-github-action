@@ -11,9 +11,6 @@ on:
 jobs:
   update-readme:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -41,14 +38,8 @@ jobs:
           ENV_ID="${{ github.event.inputs.env_id }}"
           REPO_OWNER="${{ github.repository_owner }}"
           REPO_NAME="${{ github.event.repository.name }}"
-          if [ "${{ steps.check_env.outputs.valid }}" == "true" ]; then
-            IMAGE_URL="https://qbraid-static.s3.amazonaws.com/logos/Launch_on_qbraid_with_env_white.png"
-            ENV_PARAM="&envId=$ENV_ID"
-          else
-            IMAGE_URL="https://qbraid-static.s3.amazonaws.com/logos/Launch_on_qBraid_white.png"
-            ENV_PARAM=""
-          fi
-          sed -i "s|\[<img src=\"https://qbraid-static.s3.amazonaws.com/logos/.*\" width=\"150\">\](.*)|[<img src=\"$IMAGE_URL\" width=\"150\">](https://account.qbraid.com?gitHubUrl=https://github.com/$REPO_OWNER/$REPO_NAME.git$ENV_PARAM)|" README.md
+          VALID="${{ steps.check_env.outputs.valid }}"
+          python update_readme.py "$ENV_ID" "$REPO_OWNER" "$REPO_NAME" "$VALID"
 
       - name: Commit changes
         run: |
