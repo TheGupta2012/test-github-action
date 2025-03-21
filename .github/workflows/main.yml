@@ -1,3 +1,5 @@
+name: Testing Published Action 
+
 on: [push]
 
 jobs:
