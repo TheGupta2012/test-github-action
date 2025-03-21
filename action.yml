@@ -40,16 +40,10 @@ runs:
       run: |
         pip install 'qbraid-core[environments]>=0.1.36'
 
-    - name: Set Env Config Path
-      shell: bash
-      env:
-        ENV_CONFIG_PATH: ${{ inputs.env_config_path }}
-      run: |
-        echo "Using config path $ENV_CONFIG_PATH"
-
     - name: Publish Environment
       env:
         QBRAID_API_KEY: ${{ inputs.qbraid_api_key }}
+        ENV_CONFIG_PATH: ${{ inputs.env_config_path }}
       shell: bash
       run: |
         python3 -c "import os;
