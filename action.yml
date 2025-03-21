@@ -15,6 +15,9 @@ inputs:
     description: 'Wait for the environment to be published'
     required: true
     default: false
+  qbraid_api_key:
+    description: 'API Key for qBraid'
+    required: true
 
 runs:
   using: 'composite'
@@ -30,10 +33,12 @@ runs:
         python-version: '3.11'
 
     - name: Install Dependencies
+      shell: bash
       run: |
         pip install 'qbraid-core[environments]>=0.1.36'
 
     - name: Set Env Config Path
+      shell: bash
       run: |
         if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
           echo "ENV_CONFIG_PATH=${{ github.event.inputs.env_config_path }}" >> $GITHUB_ENV
@@ -44,7 +49,8 @@ runs:
 
     - name: Publish Environment
       env:
-        QBRAID_API_KEY: ${{ secrets.QBRAID_API_KEY }}
+        QBRAID_API_KEY: ${{ github.event.inputs.qbraid_api_key }}
+      shell: bash
       run: |
         python3 -c "import os;
         from qbraid_core.services.environments.schema import EnvironmentConfig;
@@ -70,7 +76,8 @@ runs:
     - name: Wait for Env Completion
       if: ${{ github.event.inputs.wait_for_completion }}
       env:
-        QBRAID_API_KEY: ${{ secrets.QBRAID_API_KEY }}
+        QBRAID_API_KEY: ${{ github.event.inputs.qbraid_api_key }}
+      shell: bash
       run: |
         python3 -c "
         import os;
