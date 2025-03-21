@@ -10,14 +10,17 @@ inputs:
   env_config_path:
     description: 'Path to the yaml config file'
     required: true
+    type: string
     default: '.qbraid-env.yaml'
   wait_for_completion:
     description: 'Wait for the environment to be published'
     required: true
+    type: boolean
     default: false
   qbraid_api_key:
     description: 'API Key for qBraid'
     required: true
+    type: string
 
 runs:
   using: 'composite'
@@ -39,12 +42,9 @@ runs:
 
     - name: Set Env Config Path
       shell: bash
+      env:
+        ENV_CONFIG_PATH: ${{ github.event.inputs.env_config_path }}
       run: |
-        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-          echo "ENV_CONFIG_PATH=${{ github.event.inputs.env_config_path }}" >> $GITHUB_ENV
-        else
-          echo "ENV_CONFIG_PATH=.qbraid-env.yaml" >> $GITHUB_ENV
-        fi
         echo "Using config path $ENV_CONFIG_PATH"
 
     - name: Publish Environment
