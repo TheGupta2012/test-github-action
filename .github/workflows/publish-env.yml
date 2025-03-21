@@ -24,7 +24,7 @@ jobs:
           echo "Using config path ${{ github.event.inputs.env_config_path }}"
           echo "Wait for completion: ${{ github.event.inputs.wait_for_completion }}"
           echo "API Key: ${{ secrets.QBRAID_API_KEY }}"
-        with:
-          env_config_path: ${{ github.event.inputs.env_config_path }}
-          wait_for_completion: ${{ github.event.inputs.wait_for_completion }}
-          qbraid_api_key: ${{ secrets.QBRAID_API_KEY }}
+        # with:
+        #   env_config_path: ${{ github.event.inputs.env_config_path }}
+        #   wait_for_completion: ${{ github.event.inputs.wait_for_completion }}
+        #   qbraid_api_key: ${{ secrets.QBRAID_API_KEY }}
