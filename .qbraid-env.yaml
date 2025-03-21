@@ -1,0 +1,13 @@
+# Sample qBraid environment configuration
+name: "qbraid-core"
+description: "Environment for qbraid-core functionality."
+tags:
+  - "qbraid"
+  - "environment"
+  - "core"
+icon: "assets/icon.png"
+python_version: "3.11.6"
+kernel_name: "Python 3[qbraid-core]"
+shell_prompt: "qbraid_core"
+python_packages:
+  qbraid-core: ">=0.1.36"

@@ -1,38 +1,91 @@
-name: 'Hello World qBraid'
-description: 'Greet someone'
+name: 'Publish Environment on qBraid'
+description: 'A GitHub Action to remotely publish environments on qBraid'
+author: 'Harshit Gupta <harshit@qbraid.com>'
+
 branding:
-  icon: 'arrow-up'
+  icon: 'upload-cloud'
   color: 'purple'
+
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  env_config_path:
+    description: 'Path to the yaml config file'
     required: true
-    default: 'World'
-outputs:
-  random-number:
-    description: "Random number"
-    value: ${{ steps.random-number-generator.outputs.random-number }}
+    default: '.qbraid-env.yaml'
+  wait_for_completion:
+    description: 'Wait for the environment to be published'
+    required: true
+    default: false
+
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
-    - name: Set Greeting
-      run: echo "Hello $INPUT_WHO_TO_GREET."
-      shell: bash
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Dependencies
+      run: |
+        pip install 'qbraid-core[environments]>=0.1.36'
+
+    - name: Set Env Config Path
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "ENV_CONFIG_PATH=${{ github.event.inputs.env_config_path }}" >> $GITHUB_ENV
+        else
+          echo "ENV_CONFIG_PATH=.qbraid-env.yaml" >> $GITHUB_ENV
+        fi
+        echo "Using config path $ENV_CONFIG_PATH"
+
+    - name: Publish Environment
       env:
-        INPUT_WHO_TO_GREET: ${{ inputs.who-to-greet }}
+        QBRAID_API_KEY: ${{ secrets.QBRAID_API_KEY }}
+      run: |
+        python3 -c "import os;
+        from qbraid_core.services.environments.schema import EnvironmentConfig;
+        from qbraid_core.services.environments.client import EnvironmentManagerClient;
 
-    - name: Random Number Generator
-      id: random-number-generator
-      run: echo "random-number=$(echo $RANDOM)" >> $GITHUB_OUTPUT
-      shell: bash
+        # Load the environment config 
+        config_path = os.environ['ENV_CONFIG_PATH'];
+        config = EnvironmentConfig.from_yaml(config_path);
+        print(f'Successfully loaded configuration from {config_path}!');
 
-    - name: Set GitHub Path
-      run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
-      shell: bash
+        # Make request to publish 
+        client = EnvironmentManagerClient();
+        response = client.remote_publish_environment(config);
+
+        # Print the slug and set it as an env variable
+        env_slug = response['envSlug'];
+        print(f'Successfully published environment with slug: {env_slug}');
+
+        with open(os.getenv('GITHUB_ENV'), 'a') as envs_file:
+          envs_file.write(f'ENV_SLUG={env_slug}\n');
+        "
+
+    - name: Wait for Env Completion
+      if: ${{ github.event.inputs.wait_for_completion }}
       env:
-        GITHUB_ACTION_PATH: ${{ github.action_path }}
+        QBRAID_API_KEY: ${{ secrets.QBRAID_API_KEY }}
+      run: |
+        python3 -c "
+        import os;
+        from qbraid_core.services.environments.client import EnvironmentManagerClient;
 
-    - name: Run goodbye.sh
-      run: goodbye.sh
-      shell: bash
+        env_slug = os.getenv('ENV_SLUG');
+        client = EnvironmentManagerClient();
 
+        # Wait for the environment to be published
+        try:
+          success = client.wait_for_env_remote_publish(env_slug);
+          print(f'Environment publish completed, status: {success}');
+          if not success:
+            exit(1);
+        except Exception as e:
+          print(f'Error in environment publish request: {e}');
+          exit(1);
+        "

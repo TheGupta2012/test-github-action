@@ -1,5 +1,5 @@
 # test-github-action 
 
-repository for testing public github actions for qBraid
+repository for testing env publish github action for qBraid
 
 
