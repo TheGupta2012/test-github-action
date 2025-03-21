@@ -1,5 +1,7 @@
 name: 'Hello World qBraid'
 description: 'Greet someone'
+icon: 'arrow-up'
+color: 'purple'
 inputs:
   who-to-greet:  # id of input
     description: 'Who to greet'
