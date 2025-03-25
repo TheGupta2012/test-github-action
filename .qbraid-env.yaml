@@ -1,5 +1,5 @@
 # Sample qBraid environment configuration
-name: "qbraid-core"
+name: "qbraid-core-testing"
 description: "Environment for qbraid-core functionality."
 tags:
   - "qbraid"
