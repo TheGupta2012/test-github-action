@@ -53,11 +53,11 @@ runs:
         # Load the environment config 
         config_path = os.environ['ENV_CONFIG_PATH'];
         config = EnvironmentConfig.from_yaml(config_path);
-        print(f'Successfully loaded configuration from {config_path}!');
+        print(f'Successfully validated configuration from {config_path}!');
 
         # Make request to publish 
         client = EnvironmentManagerClient();
-        response = client.remote_publish_environment(config);
+        response = client.remote_publish_environment(file_path = config_path);
 
         # Print the slug and set it as an env variable
         env_slug = response['envSlug'];
